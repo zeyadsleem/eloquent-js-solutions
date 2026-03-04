@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 19 - Project: A Pixel Art Editor</title>
+  <script src="js/paint.js"></script>
+</head>
+
+<body>
+  <div></div>
+  <!-- Chapter 19 - Project: A Pixel Art Editor -->
+  <script>
+    class PixelEditor {
+      constructor(state, config) {
+        let { tools, controls, dispatch } = config;
+        this.state = state;
+
+        this.canvas = new PictureCanvas(state.picture, (pos) => {
+          let tool = tools[this.state.tool];
+          let onMove = tool(pos, this.state, dispatch);
+          if (onMove) {
+            return pos => onMove(pos, this.state, dispatch);
+          }
+        });
+        this.controls = controls.map(
+          Control => new Control(state, config));
+        this.dom = elt("div", {}, this.canvas.dom, elt("br"),
+          ...this.controls.reduce(
+            (a, c) => a.concat(" ", c.dom), []));
+      }
+      syncState(state) {
+        this.state = state;
+        this.canvas.syncState(state.picture);
+        for (let ctrl of this.controls) ctrl.syncState(state);
+      }
+    }
+
+    // Exercise 01 - Keyboard bindings
+    // Add keyDown method to PixelEditor and handle shortcuts.
+
+    // Exercise 02 - Efficient drawing
+    // Modify PictureCanvas.prototype.syncState to be more efficient.
+
+    // Exercise 03 - Circles
+    // Implement the circle tool.
+
+    // Exercise 04 - Proper lines
+    // Implement draw and line tools using a proper line-drawing algorithm.
+
+    let dom = startPixelEditor({
+      tools: baseTools,
+      controls: baseControls
+    });
+    document.querySelector("div").appendChild(dom);
+  </script>
+</body>
+
+</html>
